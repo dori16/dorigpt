@@ -1,4 +1,4 @@
-# Generative UI with React Server Components and Vercel AI SDK
+# Dorigpt
 
 This example demonstrates how to use the [Vercel AI SDK](https://sdk.vercel.ai/docs) with [Next.js](https://nextjs.org/) and the `streamUI` function to create generative user interfaces by streaming React Server Components to the client.
 
@@ -31,10 +31,4 @@ To run the example locally you need to:
 5. `npm run dev` to launch the development server.
 
 
-## Learn More
 
-To learn more about Vercel AI SDK or Next.js take a look at the following resources:
-
-- [Vercel AI SDK docs](https://sdk.vercel.ai/docs)
-- [Vercel AI Playground](https://play.vercel.ai)
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
