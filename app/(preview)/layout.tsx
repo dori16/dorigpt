@@ -1,4 +1,4 @@
-import "./globals.css";
+import "@/app/globals.css";
 import { Metadata } from "next";
 import { Toaster } from "sonner";
 import { AI } from "./actions";
@@ -6,7 +6,7 @@ import { AI } from "./actions";
 export const metadata: Metadata = {
   metadataBase: new URL("https://ai-sdk-preview-rsc-genui.vercel.dev"),
   title: "DoriGPT",
-  description: "Generative UI with React Server Components and Vercel AI SDK",
+  description: "Generative Dori assistant",
 };
 
 export default function RootLayout({

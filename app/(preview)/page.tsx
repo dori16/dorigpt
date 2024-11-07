@@ -8,22 +8,17 @@ import { motion } from "framer-motion";
 import { AttachmentIcon, SendIcon } from "@/components/icons";
 import { useRouter } from "next/navigation";
 
-export default function Home() {
-  const { sendMessage } = useActions();
+
+  export default function Home() {
+    const { sendMessage } = useActions();
+  
+
   const router = useRouter();
-
-  useEffect(() => {
-    const isAuthenticated = localStorage.getItem("isAuthenticated");
-    if (!isAuthenticated) {
-      router.push("/login");
-    }
-  }, [router]);
-
   const [input, setInput] = useState<string>("");
   const [messages, setMessages] = useState<Array<ReactNode>>([]);
-
-  const inputRef = useRef<HTMLTextAreaElement>(null);  
+  const inputRef = useRef<HTMLTextAreaElement>(null);
   const [messagesContainerRef, messagesEndRef] = useScrollToBottom<HTMLDivElement>([messages]);
+
 
   const suggestedActions = [
     { title: "Non funziona", label: "un cazzo", action: "Non funziona" },
@@ -49,6 +44,51 @@ export default function Home() {
     }
   };
 
+  useEffect(() => {
+    const checkAuth = () => {
+      try {
+        const isAuthenticated = localStorage.getItem("isAuthenticated");
+        if (!isAuthenticated) {
+          router.push("/login");
+        }
+      } catch (error) {
+        console.error("Errore nel controllo dell'autenticazione:", error);
+      }
+    };
+
+    checkAuth();
+  }, [router]);
+
+  const handleSubmit = async (text: string) => {
+    console.log("1. Inizio handleSubmit con testo:", text);
+    
+    if (!sendMessage || !text.trim()) {
+      console.log("2. Invio fallito: sendMessage non disponibile o testo vuoto");
+      return;
+    }
+    
+    try {
+      setInput("");
+      
+      setMessages((messages) => [
+        ...messages,
+        <Message key={messages.length} role="user" content={text} />,
+      ]);
+     
+      console.log("3. Prima di sendMessage");
+      const response: ReactNode = await sendMessage(text);
+      console.log("4. Dopo sendMessage, risposta ricevuta:", response);
+      
+      setMessages((messages) => [...messages, response]);
+    } catch (error) {
+      console.error("Errore durante l'invio del messaggio:", error);
+    }
+  };
+
+  useEffect(() => {
+    console.log("Valore corrente di input:", input);
+  }, [input]);
+
   return (
     <div className="bg-white dark:bg-zinc-900">
     <div className="h-[100dvh] flex flex-col bg-white/30 dark:bg-zinc-900/50 backdrop-blur-md backdrop-saturate-150 relative">
@@ -71,7 +111,7 @@ export default function Home() {
       </div>
 
       {/* Area fissa in basso */}
-      <div className="fixed bottom-0 left-0 right-0 flex justify-center w-full">
+      <div className="fixed bottom-0 left-0 right-0 flex justify-center w-full z-20">
         <div className="w-full max-w-[900px] bg-white/30 dark:bg-zinc-900/50 backdrop-blur-md border-t border-white/20 dark:border-zinc-800/30 z-20">
           {/* Suggerimenti */}
           <div className="p-2 sm:p-3">
@@ -96,13 +136,7 @@ export default function Home() {
             className="p-2 sm:p-3 w-full"
             onSubmit={async (event) => {
               event.preventDefault();
-              setMessages((messages) => [
-                ...messages,
-                <Message key={messages.length} role="user" content={input} />,
-              ]);
-              setInput("");
-              const response: ReactNode = await sendMessage(input);
-              setMessages((messages) => [...messages, response]);
+              handleSubmit(input);
             }}
           >
             <div className="flex items-center bg-white/10 dark:bg-zinc-800/30 backdrop-blur-sm border border-white/20 dark:border-zinc-800/30 rounded-md px-2 sm:px-4 shadow-lg">
@@ -126,10 +160,7 @@ export default function Home() {
                   onKeyDown={(e) => {
                     if (e.key === 'Enter' && !e.shiftKey) {
                       e.preventDefault();
-                      if (input.trim() || attachments.length > 0) {
-                        const form = e.currentTarget.form;
-                        form?.requestSubmit();
-                      }
+                      handleSubmit(input);
                     }
                     if (e.key === 'Enter' && e.shiftKey) {
                       e.preventDefault();
@@ -153,7 +184,11 @@ export default function Home() {
                 <button 
                   type="submit"
                   className="text-zinc-500 hover:text-zinc-600 dark:text-zinc-400 dark:hover:text-zinc-300 transition-colors"
-                  disabled={!input.trim() && attachments.length === 0}
+                  disabled={!input.trim()}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    handleSubmit(input);
+                  }}
                 >
                   <SendIcon />
                 </button>

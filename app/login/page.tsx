@@ -31,7 +31,7 @@ export default function Login() {
         <div className="w-full max-w-md p-6 relative z-10">
           <div className="bg-white/10 dark:bg-zinc-800/30 backdrop-blur-sm border border-white/20 dark:border-zinc-800/30 rounded-lg p-6 shadow-lg">
             <h1 className="text-2xl font-bold mb-6 text-center text-zinc-800 dark:text-zinc-100">
-              Login
+              Login DoriGPT
             </h1>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
