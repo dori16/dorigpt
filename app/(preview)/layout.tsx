@@ -5,7 +5,7 @@ import { AI } from "./actions";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://ai-sdk-preview-rsc-genui.vercel.dev"),
-  title: "DoriGPTf",
+  title: "DoriGPT",
   description: "Generative UI with React Server Components and Vercel AI SDK",
 };
 
