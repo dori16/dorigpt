@@ -1,17 +1,23 @@
 "use client";
 
-import { ReactNode, useRef, useState } from "react";
+import { ReactNode, useRef, useState, useEffect } from "react";
 import { useActions } from "ai/rsc";
 import { Message } from "@/components/message";
 import { useScrollToBottom } from "@/components/use-scroll-to-bottom";
 import { motion } from "framer-motion";
 import { AttachmentIcon, SendIcon } from "@/components/icons";
-import Link from "next/link";
-import Image from 'next/image';
-import Markdown from "react-markdown";
+import { useRouter } from "next/navigation";
 
 export default function Home() {
   const { sendMessage } = useActions();
+  const router = useRouter();
+
+  useEffect(() => {
+    const isAuthenticated = localStorage.getItem("isAuthenticated");
+    if (!isAuthenticated) {
+      router.push("/login");
+    }
+  }, [router]);
 
   const [input, setInput] = useState<string>("");
   const [messages, setMessages] = useState<Array<ReactNode>>([]);
@@ -45,7 +51,7 @@ export default function Home() {
 
   return (
     <div className="bg-white dark:bg-zinc-900">
-    <div className="h-screen flex flex-col bg-white/30 dark:bg-zinc-900/50 backdrop-blur-md backdrop-saturate-150 relative">
+    <div className="h-[100dvh] flex flex-col bg-white/30 dark:bg-zinc-900/50 backdrop-blur-md backdrop-saturate-150 relative">
       {/* Blobs decorativi */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-0 -left-4 w-48 sm:w-72 h-48 sm:h-72 bg-purple-950 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob" />
@@ -55,7 +61,7 @@ export default function Home() {
       {/* Area messaggi con scroll */}
       <div 
         ref={messagesContainerRef}
-        className="flex-1 overflow-y-auto scrollbar relative z-10 flex flex-col items-center"
+        className="flex-1 overflow-y-auto scrollbar relative z-10 flex flex-col items-center pb-[120px] sm:pb-[150px]"
         style={{ scrollbarWidth: 'thin', scrollbarColor: '#888888 transparent' }}
       >
         <div className="w-full max-w-[900px] px-4">
@@ -65,10 +71,10 @@ export default function Home() {
       </div>
 
       {/* Area fissa in basso */}
-      <div className="flex justify-center w-full">
-        <div className="sticky bottom-0 w-full max-w-[900px] bg-white/30 dark:bg-zinc-900/50 backdrop-blur-md border-t border-white/20 dark:border-zinc-800/30 z-20">
-          {/* Suggerimenti sempre visibili */}
-          <div className="p-2 sm:p-4">
+      <div className="fixed bottom-0 left-0 right-0 flex justify-center w-full">
+        <div className="w-full max-w-[900px] bg-white/30 dark:bg-zinc-900/50 backdrop-blur-md border-t border-white/20 dark:border-zinc-800/30 z-20">
+          {/* Suggerimenti */}
+          <div className="p-2 sm:p-3">
             <div className="flex flex-wrap gap-1 sm:gap-2 justify-center sm:justify-start">
               {suggestedActions.map((action, index) => (
                 <button
@@ -87,7 +93,7 @@ export default function Home() {
 
           {/* Form input */}
           <form
-            className="p-2 sm:p-4 w-full"
+            className="p-2 sm:p-3 w-full"
             onSubmit={async (event) => {
               event.preventDefault();
               setMessages((messages) => [
