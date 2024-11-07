@@ -48,8 +48,8 @@ export default function Home() {
     <div className="h-screen flex flex-col bg-white/30 dark:bg-zinc-900/50 backdrop-blur-md backdrop-saturate-150 relative">
       {/* Blobs decorativi */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-0 -left-4 w-72 h-72 bg-purple-950 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob" />
-        <div className="absolute top-0 -right-4 w-72 h-72 bg-blue-950 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-2000" />
+        <div className="absolute top-0 -left-4 w-48 sm:w-72 h-48 sm:h-72 bg-purple-950 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob" />
+        <div className="absolute top-0 -right-4 w-48 sm:w-72 h-48 sm:h-72 bg-blue-950 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-2000" />
       </div>
 
       {/* Area messaggi con scroll */}
@@ -58,104 +58,103 @@ export default function Home() {
         className="flex-1 overflow-y-auto scrollbar relative z-10 flex flex-col items-center"
         style={{ scrollbarWidth: 'thin', scrollbarColor: '#888888 transparent' }}
       >
-        <div className="w-[900px]">
+        <div className="w-full max-w-[900px] px-4">
           {messages.map((message) => message)}
           <div ref={messagesEndRef} />
         </div>
       </div>
 
       {/* Area fissa in basso */}
-      <div className="flex justify-center">
-      <div className="sticky bottom-0 w-[900px] bg-white/30 dark:bg-zinc-900/50 backdrop-blur-md border-t border-white/20 dark:border-zinc-800/30  z-20">
-        {/* Suggerimenti sempre visibili */}
-        <div className="p-4">
-          <div className="flex flex-wrap gap-2">
-            {suggestedActions.map((action, index) => (
-              <button
-                key={index}
-                className="px-4 py-2 bg-white/10 hover:bg-white/20 dark:bg-zinc-800/30 dark:hover:bg-zinc-800/50 rounded-md backdrop-blur-sm border border-white/20 dark:border-zinc-800/30 transition-all duration-200"
-                onClick={() => {
-                  setInput(action.action);
-                }}
-              >
-                <span className="font-medium">{action.title}</span>{" "}
-                <span className="text-zinc-600 dark:text-zinc-400">{action.label}</span>
-              </button>
-            ))}
+      <div className="flex justify-center w-full">
+        <div className="sticky bottom-0 w-full max-w-[900px] bg-white/30 dark:bg-zinc-900/50 backdrop-blur-md border-t border-white/20 dark:border-zinc-800/30 z-20">
+          {/* Suggerimenti sempre visibili */}
+          <div className="p-2 sm:p-4">
+            <div className="flex flex-wrap gap-1 sm:gap-2 justify-center sm:justify-start">
+              {suggestedActions.map((action, index) => (
+                <button
+                  key={index}
+                  className="px-2 sm:px-4 py-1 sm:py-2 text-xs sm:text-sm bg-white/10 hover:bg-white/20 dark:bg-zinc-800/30 dark:hover:bg-zinc-800/50 rounded-md backdrop-blur-sm border border-white/20 dark:border-zinc-800/30 transition-all duration-200"
+                  onClick={() => {
+                    setInput(action.action);
+                  }}
+                >
+                  <span className="font-medium">{action.title}</span>{" "}
+                  <span className="text-zinc-600 dark:text-zinc-400">{action.label}</span>
+                </button>
+              ))}
+            </div>
           </div>
-        </div>
 
-        {/* Form input */}
-        <form
-          className="p-4 w-[900px]"
-          onSubmit={async (event) => {
-            event.preventDefault();
-            setMessages((messages) => [
-              ...messages,
-              <Message key={messages.length} role="user" content={input} />,
-            ]);
-            setInput("");
-            const response: ReactNode = await sendMessage(input);
-            setMessages((messages) => [...messages, response]);
-          }}
-        >
-          <div className="flex items-center bg-white/10 dark:bg-zinc-800/30 backdrop-blur-sm border border-white/20 dark:border-zinc-800/30 rounded-md px-4  shadow-lg">
-          <div className="w-full">
-            <textarea
-              ref={inputRef}
-              className=" w-full < bg-transparent outline-none text-zinc-800 dark:text-zinc-300 overflow-y-scroll scrollbar resize-none min-h-[20px] max-h-[160px]"
-              style={{ 
-                scrollbarWidth: 'thin', 
-                scrollbarColor: '#888888 transparent',
-                textAlign: 'left',
-           
-              }}
-              placeholder="Scrivi un messaggio a DoriGPT"
-              value={input}
-              onChange={(event) => {
-                setInput(event.target.value);
-                event.target.style.height = 'inherit';
-                const scrollHeight = event.target.scrollHeight;
-                event.target.style.height = `${Math.min(scrollHeight, 160)}px`;
-              }}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' && !e.shiftKey) {
-                  e.preventDefault();
-                  if (input.trim() || attachments.length > 0) {
-                    const form = e.currentTarget.form;
-                    form?.requestSubmit();
-                  }
-                }
-                if (e.key === 'Enter' && e.shiftKey) {
-                  e.preventDefault();
-                  setInput(prev => prev + '\n');
-                }
-              }}
-            />
+          {/* Form input */}
+          <form
+            className="p-2 sm:p-4 w-full"
+            onSubmit={async (event) => {
+              event.preventDefault();
+              setMessages((messages) => [
+                ...messages,
+                <Message key={messages.length} role="user" content={input} />,
+              ]);
+              setInput("");
+              const response: ReactNode = await sendMessage(input);
+              setMessages((messages) => [...messages, response]);
+            }}
+          >
+            <div className="flex items-center bg-white/10 dark:bg-zinc-800/30 backdrop-blur-sm border border-white/20 dark:border-zinc-800/30 rounded-md px-2 sm:px-4 shadow-lg">
+              <div className="w-full">
+                <textarea
+                  ref={inputRef}
+                  className="w-full bg-transparent outline-none text-sm sm:text-base text-zinc-800 dark:text-zinc-300 overflow-y-scroll scrollbar resize-none min-h-[20px] max-h-[160px] py-2 sm:py-3"
+                  style={{ 
+                    scrollbarWidth: 'thin', 
+                    scrollbarColor: '#888888 transparent',
+                    textAlign: 'left',
+                  }}
+                  placeholder="Scrivi un messaggio a DoriGPT"
+                  value={input}
+                  onChange={(event) => {
+                    setInput(event.target.value);
+                    event.target.style.height = 'inherit';
+                    const scrollHeight = event.target.scrollHeight;
+                    event.target.style.height = `${Math.min(scrollHeight, 160)}px`;
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                      e.preventDefault();
+                      if (input.trim() || attachments.length > 0) {
+                        const form = e.currentTarget.form;
+                        form?.requestSubmit();
+                      }
+                    }
+                    if (e.key === 'Enter' && e.shiftKey) {
+                      e.preventDefault();
+                      setInput(prev => prev + '\n');
+                    }
+                  }}
+                />
+              </div>
+              <div className="flex items-center gap-2 sm:gap-3 ml-auto">
+                <input
+                  type="file"
+                  id="file-upload"
+                  className="hidden"
+                  accept="image/*"
+                  multiple
+                  onChange={handleFileUpload}
+                />
+                <label htmlFor="file-upload" className="cursor-pointer text-zinc-500 hover:text-zinc-600 dark:text-zinc-400 dark:hover:text-zinc-300 transition-colors">
+                  <AttachmentIcon  />
+                </label>
+                <button 
+                  type="submit"
+                  className="text-zinc-500 hover:text-zinc-600 dark:text-zinc-400 dark:hover:text-zinc-300 transition-colors"
+                  disabled={!input.trim() && attachments.length === 0}
+                >
+                  <SendIcon />
+                </button>
+              </div>
             </div>
-            <div className="flex items-center gap-3 ml-auto">
-              <input
-                type="file"
-                id="file-upload"
-                className="hidden"
-                accept="image/*"
-                multiple
-                onChange={handleFileUpload}
-              />
-              <label htmlFor="file-upload" className="cursor-pointer text-zinc-500 hover:text-zinc-600 dark:text-zinc-400 dark:hover:text-zinc-300 transition-colors">
-                <AttachmentIcon />
-              </label>
-              <button 
-                type="submit"
-                className="text-zinc-500 hover:text-zinc-600 dark:text-zinc-400 dark:hover:text-zinc-300 transition-colors"
-                disabled={!input.trim() && attachments.length === 0}
-              >
-                <SendIcon />
-              </button>
-            </div>
-          </div>
-        </form>
-      </div>
+          </form>
+        </div>
       </div>
     </div>
     </div>

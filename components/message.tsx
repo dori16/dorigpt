@@ -73,22 +73,22 @@ export const Message = ({
 
   return (
     <motion.div
-      className={`flex flex-row gap-4 px-4 w-full max-w-[900px] mx-auto md:px-0 first-of-type:pt-20 py-4 ${
+      className={`flex flex-row gap-2 sm:gap-4 px-2 sm:px-4 w-full max-w-[900px] mx-auto md:px-0 first-of-type:pt-10 sm:first-of-type:pt-20 py-2 sm:py-4 ${
         role === "user" ? "flex-row-reverse" : ""
       }`}
       initial={{ y: 5, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
     >
-      <div className="size-[24px] flex flex-col justify-center items-center flex-shrink-0  text-zinc-400">
+      <div className="size-[20px] sm:size-[24px] flex flex-col justify-center items-center flex-shrink-0 text-zinc-400">
         {role === "assistant" ? <BotIcon /> : <UserIcon />}
       </div>
 
-      <div className={`flex flex-col gap-1 w-full  ${
+      <div className={`flex flex-col gap-1 w-full ${
         role === "user" ? "items-end" : ""
       }`}>
     
-        <div className={`text-zinc-800 dark:text-zinc-300 flex flex-col gap-4 ${
-          role === "user" ? "text-right max-w-[80%]" : ""
+        <div className={`text-sm sm:text-base text-zinc-800 dark:text-zinc-300 flex flex-col gap-2 sm:gap-4 ${
+          role === "user" ? "text-right max-w-[90%] sm:max-w-[80%]" : ""
         }`}>
           {content}
         </div>
