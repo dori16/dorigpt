@@ -20,7 +20,7 @@ export const TextStreamMessage = ({
       const textToCopy = typeof streamedContent === 'string' 
         ? streamedContent 
         : streamedContent.toString()
-          .replace(/,false|,true/g, '')
+          .replace(/,\s*(false|true)/g, '')
           .replace(/,\s*$/, '');
         
       await navigator.clipboard.writeText(textToCopy);
@@ -49,7 +49,11 @@ export const TextStreamMessage = ({
           {copied ? "✓ Copiato!" : "📋 Copia"}
         </button>
         <div className="text-zinc-800 dark:text-zinc-300 flex flex-col gap-4">
-          <Markdown>{streamedContent.toString()}</Markdown>
+          <Markdown>
+            {streamedContent.toString()
+              .replace(/,\s*(false|true)/g, '')
+              .replace(/,\s*$/, '')}
+          </Markdown>
         </div>
       </div>
     </motion.div>
