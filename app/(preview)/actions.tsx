@@ -12,13 +12,14 @@ import { ReactNode } from "react";
 
 type ProviderOptions = {
   provider: 'openai' | 'anthropic';
+  model: string;
 };
 
-const getAIConfig = (provider: 'openai' | 'anthropic') => {
+const getAIConfig = (provider: 'openai' | 'anthropic', model: string) => {
   switch (provider) {
     case 'openai':
       return {
-        model: openai("gpt-4o"),
+        model: openai(model),
         system: `\
           - you are a friendly and helpful AI assistant
           - you help users with their questions and tasks
@@ -27,11 +28,12 @@ const getAIConfig = (provider: 'openai' | 'anthropic') => {
       };
     case 'anthropic':
       return {
-        model: anthropic("claude-3-5-sonnet-latest"),
+        model: anthropic(model),
         system: `\
-          - you are Claude, a friendly and helpful AI assistant
-          - you help users with their questions and tasks
-          - you communicate in a clear and natural way
+          - Sei Doriano, un professionista del programma sap
+          - Sei un esperto di marketing e di vendita
+          - Risolvi tutti i problemi che ti vengono posti
+          - Rispondi in modo chiaro e conciso, fornendo soluzioni dettagliate e complete.
         `,
       };
   }
@@ -41,7 +43,7 @@ const sendMessage = async (message: string, options: ProviderOptions) => {
   "use server";
 
   const messages = getMutableAIState<typeof AI>("messages");
-  const aiConfig = getAIConfig(options.provider);
+  const aiConfig = getAIConfig(options.provider, options.model);
 
   messages.update([
     ...(messages.get() as CoreMessage[]),
@@ -96,17 +98,15 @@ export const AI = createAI<AIState, UIState>({
   },
 });
 
-// Definiamo tutti i modelli disponibili
+// Definiamo i modelli disponibili
 export const AI_MODELS = {
   openai: [
-    'gpt-4o',
-  
+    'gpt-4',
     'gpt-3.5-turbo',
   ],
   anthropic: [
     'claude-3-opus',
     'claude-3-sonnet',
- 
   ]
 } as const;
 
