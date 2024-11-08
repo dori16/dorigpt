@@ -16,6 +16,8 @@ type ProviderOptions = {
 };
 
 const getAIConfig = (provider: 'openai' | 'anthropic', model: string) => {
+  console.log(`Configurando per provider: ${provider} con modello: ${model}`);
+  
   switch (provider) {
     case 'openai':
       return {
@@ -36,14 +38,21 @@ const getAIConfig = (provider: 'openai' | 'anthropic', model: string) => {
           - Rispondi in modo chiaro e conciso, fornendo soluzioni dettagliate e complete.
         `,
       };
+    default:
+      throw new Error(`Provider non supportato: ${provider}`);
   }
 };
 
 const sendMessage = async (message: string, options: ProviderOptions) => {
   "use server";
 
+  console.log("Provider ricevuto:", options.provider);
+  console.log("Modello ricevuto:", options.model);
+
   const messages = getMutableAIState<typeof AI>("messages");
   const aiConfig = getAIConfig(options.provider, options.model);
+
+  console.log("Config generata:", aiConfig);
 
   messages.update([
     ...(messages.get() as CoreMessage[]),
@@ -101,12 +110,12 @@ export const AI = createAI<AIState, UIState>({
 // Definiamo i modelli disponibili
 export const AI_MODELS = {
   openai: [
-    'gpt-4',
+    'gpt-4o',
     'gpt-3.5-turbo',
   ],
   anthropic: [
-    'claude-3-opus',
-    'claude-3-sonnet',
+    'claude-3-5-sonnet-latest',
+    'claude-3-opus-latest',
   ]
 } as const;
 

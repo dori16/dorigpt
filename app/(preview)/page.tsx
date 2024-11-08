@@ -40,7 +40,7 @@ import { useRouter } from "next/navigation";
   // Definisci i modelli disponibili
   const AI_MODELS = {
     openai: ['gpt-4o', 'gpt-3.5-turbo'] as const,
-    anthropic: ['claude-3-opus', 'claude-3-sonnet'] as const
+    anthropic: ['claude-3-5-sonnet-latest', 'claude-3-opus'] as const
   };
 
   // Modifica lo state per includere sia il provider che il modello specifico
@@ -69,34 +69,45 @@ import { useRouter } from "next/navigation";
   }, [router]);
 
   const handleSubmit = async (text: string) => {
-    console.log("1. Inizio handleSubmit con testo:", text);
-    
-    if (!sendMessage || !text.trim()) {
-      console.log("2. Invio fallito: sendMessage non disponibile o testo vuoto");
-      return;
-    }
+    console.log("Provider selezionato:", aiProvider);
+    console.log("Modello selezionato:", selectedModel);
     
     try {
+      const response: ReactNode = await sendMessage(text, { 
+        provider: aiProvider, 
+        model: selectedModel 
+      });
+      console.log("Risposta ricevuta:", response);
+      
       setInput("");
       
       setMessages((messages) => [
         ...messages,
         <Message key={messages.length} role="user" content={text} />,
       ]);
-     
-      console.log("3. Prima di sendMessage con provider:", aiProvider);
-      const response: ReactNode = await sendMessage(text, { provider: aiProvider, model: selectedModel });
-      console.log("4. Dopo sendMessage, risposta ricevuta:", response);
       
       setMessages((messages) => [...messages, response]);
     } catch (error) {
-      console.error("Errore durante l'invio del messaggio:", error);
+      console.error("Errore dettagliato:", error);
     }
   };
 
   useEffect(() => {
     console.log("Valore corrente di input:", input);
   }, [input]);
+
+  // Funzione per determinare il provider dal modello selezionato
+  const getProviderFromModel = (model: string) => {
+    if (AI_MODELS.openai.includes(model as any)) return 'openai';
+    if (AI_MODELS.anthropic.includes(model as any)) return 'anthropic';
+    return 'openai'; // default fallback
+  };
+
+  // Aggiorna il gestore del cambio modello
+  const handleModelChange = (model: string) => {
+    setSelectedModel(model);
+    setAiProvider(getProviderFromModel(model));
+  };
 
   return (
     <div className="bg-white dark:bg-zinc-900">
@@ -105,7 +116,7 @@ import { useRouter } from "next/navigation";
       <div className="absolute top-4 right-4 z-20">
         <select
           value={selectedModel}
-          onChange={(e) => setSelectedModel(e.target.value)}
+          onChange={(e) => handleModelChange(e.target.value)}
           className="bg-white/10 dark:bg-zinc-800/30 backdrop-blur-sm border border-white/20 dark:border-zinc-800/30 rounded-md px-3 py-1 text-sm text-zinc-800 dark:text-zinc-300 outline-none"
         >
           <optgroup label="OpenAI">
