@@ -39,7 +39,6 @@ const getAIConfig = (provider: 'openai' | 'anthropic') => {
 
 const sendMessage = async (message: string, options: ProviderOptions) => {
   "use server";
-  console.log("API Key available:", !!process.env.OPENAI_API_KEY);
 
   const messages = getMutableAIState<typeof AI>("messages");
   const aiConfig = getAIConfig(options.provider);
@@ -96,3 +95,20 @@ export const AI = createAI<AIState, UIState>({
     }
   },
 });
+
+// Definiamo tutti i modelli disponibili
+export const AI_MODELS = {
+  openai: [
+    'gpt-4o',
+  
+    'gpt-3.5-turbo',
+  ],
+  anthropic: [
+    'claude-3-opus',
+    'claude-3-sonnet',
+ 
+  ]
+} as const;
+
+// Tipo per i modelli
+export type AIModel = typeof AI_MODELS[keyof typeof AI_MODELS][number];

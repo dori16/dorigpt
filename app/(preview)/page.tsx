@@ -37,6 +37,15 @@ import { useRouter } from "next/navigation";
   const [attachments, setAttachments] = useState<File[]>([]);
   const [aiProvider, setAiProvider] = useState<'openai' | 'anthropic'>('openai');
 
+  // Definisci i modelli disponibili
+  const AI_MODELS = {
+    openai: ['gpt-4o', 'gpt-3.5-turbo'] as const,
+    anthropic: ['claude-3-opus', 'claude-3-sonnet'] as const
+  };
+
+  // Modifica lo state per includere sia il provider che il modello specifico
+  const [selectedModel, setSelectedModel] = useState<string>(AI_MODELS.openai[0]);
+
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
     if (files) {
@@ -76,7 +85,7 @@ import { useRouter } from "next/navigation";
       ]);
      
       console.log("3. Prima di sendMessage con provider:", aiProvider);
-      const response: ReactNode = await sendMessage(text, { provider: aiProvider });
+      const response: ReactNode = await sendMessage(text, { provider: aiProvider, model: selectedModel });
       console.log("4. Dopo sendMessage, risposta ricevuta:", response);
       
       setMessages((messages) => [...messages, response]);
@@ -95,12 +104,20 @@ import { useRouter } from "next/navigation";
       {/* Dropdown per la selezione del provider */}
       <div className="absolute top-4 right-4 z-20">
         <select
-          value={aiProvider}
-          onChange={(e) => setAiProvider(e.target.value as 'openai' | 'anthropic')}
+          value={selectedModel}
+          onChange={(e) => setSelectedModel(e.target.value)}
           className="bg-white/10 dark:bg-zinc-800/30 backdrop-blur-sm border border-white/20 dark:border-zinc-800/30 rounded-md px-3 py-1 text-sm text-zinc-800 dark:text-zinc-300 outline-none"
         >
-          <option value="openai">Gpt-4o</option>
-          <option value="anthropic">Claude-3.5-sonnet</option>
+          <optgroup label="OpenAI">
+            {AI_MODELS.openai.map(model => (
+              <option key={model} value={model}>{model}</option>
+            ))}
+          </optgroup>
+          <optgroup label="Anthropic">
+            {AI_MODELS.anthropic.map(model => (
+              <option key={model} value={model}>{model}</option>
+            ))}
+          </optgroup>
         </select>
       </div>
 
@@ -113,7 +130,7 @@ import { useRouter } from "next/navigation";
       {/* Area messaggi con scroll */}
       <div 
         ref={messagesContainerRef}
-        className="flex-1 overflow-y-auto scrollbar relative z-10 flex flex-col items-center pb-[120px] sm:pb-[150px]"
+        className="flex-1 overflow-y-auto scrollbar relative z-10 flex flex-col items-center pb-4"
         style={{ scrollbarWidth: 'thin', scrollbarColor: '#888888 transparent' }}
       >
         <div className="w-full max-w-[900px] px-4">
@@ -122,9 +139,9 @@ import { useRouter } from "next/navigation";
         </div>
       </div>
 
-      {/* Area fissa in basso */}
-      <div className="fixed bottom-0 left-0 right-0 flex justify-center w-full z-20">
-        <div className="w-full max-w-[900px] bg-white/30 dark:bg-zinc-900/50 backdrop-blur-md border-t border-white/20 dark:border-zinc-800/30 z-20">
+      {/* Area fissa in basso - modificata per centrare e limitare larghezza */}
+      <div className="sticky bottom-0 left-0 right-0 flex justify-center w-full z-20">
+        <div className="w-full max-w-[900px] bg-white/30 dark:bg-zinc-900/50 backdrop-blur-md border-t border-white/20 dark:border-zinc-800/30">
           {/* Suggerimenti */}
           <div className="p-2 sm:p-3">
             <div className="flex flex-wrap gap-1 sm:gap-2 justify-center sm:justify-start">
@@ -144,13 +161,7 @@ import { useRouter } from "next/navigation";
           </div>
 
           {/* Form input */}
-          <form
-            className="p-2 sm:p-3 w-full"
-            onSubmit={async (event) => {
-              event.preventDefault();
-              handleSubmit(input);
-            }}
-          >
+          <div className="p-2 sm:p-3 w-full">
             <div className="flex items-center bg-white/10 dark:bg-zinc-800/30 backdrop-blur-sm border border-white/20 dark:border-zinc-800/30 rounded-md px-2 sm:px-4 shadow-lg">
               <div className="w-full">
                 <textarea
@@ -206,7 +217,7 @@ import { useRouter } from "next/navigation";
                 </button>
               </div>
             </div>
-          </form>
+          </div>
         </div>
       </div>
     </div>
