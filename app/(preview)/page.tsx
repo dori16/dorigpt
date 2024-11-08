@@ -4,7 +4,6 @@ import { ReactNode, useRef, useState, useEffect } from "react";
 import { useActions } from "ai/rsc";
 import { Message } from "@/components/message";
 import { useScrollToBottom } from "@/components/use-scroll-to-bottom";
-import { motion } from "framer-motion";
 import { AttachmentIcon, SendIcon } from "@/components/icons";
 import { useRouter } from "next/navigation";
 
@@ -36,6 +35,7 @@ import { useRouter } from "next/navigation";
   ];
 
   const [attachments, setAttachments] = useState<File[]>([]);
+  const [aiProvider, setAiProvider] = useState<'openai' | 'anthropic'>('openai');
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
@@ -75,8 +75,8 @@ import { useRouter } from "next/navigation";
         <Message key={messages.length} role="user" content={text} />,
       ]);
      
-      console.log("3. Prima di sendMessage");
-      const response: ReactNode = await sendMessage(text);
+      console.log("3. Prima di sendMessage con provider:", aiProvider);
+      const response: ReactNode = await sendMessage(text, { provider: aiProvider });
       console.log("4. Dopo sendMessage, risposta ricevuta:", response);
       
       setMessages((messages) => [...messages, response]);
@@ -92,6 +92,18 @@ import { useRouter } from "next/navigation";
   return (
     <div className="bg-white dark:bg-zinc-900">
     <div className="h-[100dvh] flex flex-col bg-white/30 dark:bg-zinc-900/50 backdrop-blur-md backdrop-saturate-150 relative">
+      {/* Dropdown per la selezione del provider */}
+      <div className="absolute top-4 right-4 z-20">
+        <select
+          value={aiProvider}
+          onChange={(e) => setAiProvider(e.target.value as 'openai' | 'anthropic')}
+          className="bg-white/10 dark:bg-zinc-800/30 backdrop-blur-sm border border-white/20 dark:border-zinc-800/30 rounded-md px-3 py-1 text-sm text-zinc-800 dark:text-zinc-300 outline-none"
+        >
+          <option value="openai">Gpt-4o</option>
+          <option value="anthropic">Claude-3.5-sonnet</option>
+        </select>
+      </div>
+
       {/* Blobs decorativi */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-0 -left-4 w-48 sm:w-72 h-48 sm:h-72 bg-purple-950 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob" />

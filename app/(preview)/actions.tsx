@@ -1,5 +1,6 @@
 import { Message, TextStreamMessage } from "@/components/message";
 import { openai } from "@ai-sdk/openai";
+import { anthropic } from '@ai-sdk/anthropic';
 import { CoreMessage, generateId } from "ai";
 import {
   createAI,
@@ -9,11 +10,39 @@ import {
 } from "ai/rsc";
 import { ReactNode } from "react";
 
+type ProviderOptions = {
+  provider: 'openai' | 'anthropic';
+};
 
-const sendMessage = async (message: string) => {
+const getAIConfig = (provider: 'openai' | 'anthropic') => {
+  switch (provider) {
+    case 'openai':
+      return {
+        model: openai("gpt-4o"),
+        system: `\
+          - you are a friendly and helpful AI assistant
+          - you help users with their questions and tasks
+          - you communicate in a clear and natural way
+        `,
+      };
+    case 'anthropic':
+      return {
+        model: anthropic("claude-3-5-sonnet-latest"),
+        system: `\
+          - you are Claude, a friendly and helpful AI assistant
+          - you help users with their questions and tasks
+          - you communicate in a clear and natural way
+        `,
+      };
+  }
+};
+
+const sendMessage = async (message: string, options: ProviderOptions) => {
   "use server";
+  console.log("API Key available:", !!process.env.OPENAI_API_KEY);
 
   const messages = getMutableAIState<typeof AI>("messages");
+  const aiConfig = getAIConfig(options.provider);
 
   messages.update([
     ...(messages.get() as CoreMessage[]),
@@ -24,12 +53,7 @@ const sendMessage = async (message: string) => {
   const textComponent = <TextStreamMessage content={contentStream.value} />;
 
   const { value: stream } = await streamUI({
-    model: openai("gpt-4o"),
-    system: `\
-     - you are a friendly and helpful AI assistant
-      - you help users with their questions and tasks
-      - you communicate in a clear and natural way
-    `,
+    ...aiConfig,
     messages: messages.get() as CoreMessage[],
     text: async function* ({ content, done }) {
       if (done) {
@@ -37,12 +61,10 @@ const sendMessage = async (message: string) => {
           ...(messages.get() as CoreMessage[]),
           { role: "assistant", content },
         ]);
-
         contentStream.done();
       } else {
         contentStream.update(content);
       }
-
       return textComponent;
     }
   });
